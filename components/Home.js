@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import Button from "react-native-button";
 import {Actions} from "react-native-router-flux";
-import { FisrtView, SecondView, ThirdView } from './Views'
 import { IndicatorViewPager, PagerTitleIndicator } from 'rn-viewpager'
 
 var styles = StyleSheet.create({
