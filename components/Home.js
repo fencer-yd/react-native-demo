@@ -9,6 +9,7 @@ import {
     ScrollView,
     TouchableOpacity,
     Image,
+    ListView,
     Animated
 } from "react-native";
 import Button from "react-native-button";
@@ -89,8 +90,21 @@ var styles = StyleSheet.create({
         borderBottomColor: 'white',
         backgroundColor: 'transparent',
         width: 140
+    },
+    listText: {
+        width: 300,
+        height: 50,
+        marginTop: 20,
+        backgroundColor: '#f5f5f5',
+        textAlign: 'center',
+        padding: 15
     }
 });
+
+
+const showItem = (rowData) => {
+    return (<Text>{rowData}</Text>)
+}
 
 
 class Home extends React.Component {
@@ -98,10 +112,19 @@ class Home extends React.Component {
 		super(props);
         ToastAndroid.show(props.title, ToastAndroid.SHORT)
 	}
+
+    _ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+
     state = {
+        dataSource: this._ds.cloneWithRows(['row 1', 'row 2', 'row3', 'row4', 'row5', 'row6']),
         bgColor: new Animated.Value(0)
-    }
+    };
+
     _setBgColor = Animated.event([{bgColor: this.state.bgColor}])
+
+    _showRowData (rowData) {
+        alert(rowData);
+    }
 
     _renderTitleIndicator () {
         return (
@@ -121,20 +144,30 @@ class Home extends React.Component {
         this._setBgColor({bgColor: offset + position})
     }
 
+    _renderRowData(rowData) {
+        return (
+            <TouchableOpacity onPress={() => this._showRowData(rowData)}>
+                <View>
+                    <Text style={styles.listText}>{rowData}</Text>
+                </View>
+            </TouchableOpacity>
+        )
+    }
+
     render(){
         let bgColor = this.state.bgColor.interpolate({
             inputRange: [0, 1, 2],
-            outputRange: ['hsl(187, 74%, 47%)', 'hsl(89, 47%, 54%)', 'hsl(12, 97%, 59%)']
+            outputRange: ['#fff', '#eee', '#ddd']
         })
         return (
             <Animated.View style={{flex: 1, backgroundColor: bgColor}} >
                 <View >
                     {Platform.OS === 'ios' && <View style={styles.statusBar} />}
                     <View style={styles.toolbarContainer} >
-                        <TouchableOpacity onPress={() => this.props.navigator.pop()} >
+                        <TouchableOpacity onPress={Actions.launch} >
                             <Image style={styles.backImg} source={require('../imgs/back_arrow.png')} />
                         </TouchableOpacity>
-                        <Text style={styles.titleTxt} >TITLE</Text>
+                        <Text style={styles.titleTxt} >兰州银行</Text>
                     </View>
                 </View>
                 <IndicatorViewPager
@@ -143,22 +176,15 @@ class Home extends React.Component {
                     onPageScroll={this._onPageScroll.bind(this)}
                 >
                     {<View style={styles.pageContainer} >
-                        <View style={[styles.shapeBase, styles.square]} />
-                        <View style={styles.mainRec} />
-                        <View style={styles.subRec} />
-                        <View style={styles.subRec} />
+                        <ListView
+                            dataSource={this.state.dataSource}
+                            renderRow={this._renderRowData.bind(this)}
+                        />
                     </View>}
                     {<View style={styles.pageContainer} >
-                        <View style={[styles.shapeBase, styles.triangle]} />
-                        <View style={styles.mainRec} />
-                        <View style={styles.subRec} />
-                        <View style={styles.subRec} />
                     </View>}
                     {<View style={styles.pageContainer} >
-                        <View style={[styles.shapeBase, styles.circle]} />
-                        <View style={styles.mainRec} />
-                        <View style={styles.subRec} />
-                        <View style={styles.subRec} />
+                        
                     </View>}
                 </IndicatorViewPager>
             </Animated.View>
